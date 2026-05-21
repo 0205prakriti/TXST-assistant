@@ -5204,10 +5204,19 @@ Last Day to Withdraw from the University (Study Abroad Non-FL ISEP)
 Dropping vs Withdrawing
 April 30th
 Thursday, 2026
+Last Day to Register with No Fee  (102 - Extension Special)
+April 30th
+Thursday, 2026
 Last Day to Register with No Fee (10 - 10-Ten Wk Session Long Term)
 April 30th
 Thursday, 2026
 Last Day to Register with No Fee (10A - 10 Week Session (AP))
+April 30th
+Thursday, 2026
+Last Day to Register with No Fee (1M - 3 Week Intersession)
+April 30th
+Thursday, 2026
+Last Day to Register with No Fee (240 - SA 4 Wks (Early Strt))
 April 30th
 Thursday, 2026
 Last Day to Register with No Fee (8A - First 8 Week Session (AP))
@@ -5228,13 +5237,13 @@ Thursday, 2026
 Last Day to Register with No Fee (First 8 Weeks)
 April 30th
 Thursday, 2026
-Last Day to Register with No Fee (First 8 Weeks)
-April 30th
-Thursday, 2026
 Last Day to Register with No Fee (Fourth 3 Weeks)
 April 30th
 Thursday, 2026
 Last Day to Register with No Fee (Full Term)
+April 30th
+Thursday, 2026
+Last Day to Register with No Fee (SA (Non-FL ISEP))
 April 30th
 Thursday, 2026
 Last Day to Register with No Fee (Second 3 Weeks)
@@ -5366,11 +5375,21 @@ Thursday, 2026
 Classes Begin (1M - 3 Week Intersession)
 May 14th
 Thursday, 2026
+Classes Begin (240 - SA 4 Wks (Early Strt))
+May 14th
+Thursday, 2026
 Last Day to Add a Course (1M - 3 Week Intersession)
 (Ends at 3:45 p.m.)
 May 14th
 Thursday, 2026
-Last Day to Register with $25 Fee (First 8 Weeks)
+Last Day to Add a Course (240 - SA 4 Wks (Early Strt))
+(Ends at 3:45 p.m.)
+May 14th
+Thursday, 2026
+Last Day to Register with $25 Fee (1M - 3 Week Intersession)
+May 14th
+Thursday, 2026
+Last Day to Register with $25 Fee (240 - SA 4 Wks (Early Strt))
 May 14th
 Thursday, 2026
 Spring 2026 Commencement
@@ -5387,14 +5406,29 @@ Last Day to Drop a Course with no Record on Transcript (1M - 3 Week Intersession
 Dropping vs Withdrawing
 May 16th
 Saturday, 2026
+Census (240 - SA 4 Wks (Early Strt))
+May 16th
+Saturday, 2026
+Last Day to Drop a Course with no Record on Transcript (240 - SA 4 Wks (Early Strt))
+(Ends at 11:59 p.m.)
+Dropping vs Withdrawing
+May 16th
+Saturday, 2026
 Official Graduation Date on Transcript for Spring 2026
 May 16th
 Saturday, 2026
 Roster Certification (1M - 3 Week Intersession)
 (Due at noon) Starts on 5/16 and runs through 5/20
+May 17th
+Sunday, 2026
+Roster Certification (240 - SA 4 Wks (Early Strt))
+(Due at noon) Starts on 5/17 and runs through 5/21
 May 18th
 Monday, 2026
 Classes Begin (10 - 10-Ten Wk Session Long Term)
+May 18th
+Monday, 2026
+Classes Begin (102 - Extension Special)
 May 18th
 Monday, 2026
 Grades Due (16 Week Session (AP))
@@ -5447,6 +5481,21 @@ May 19th
 Tuesday, 2026
 Grades Available (Study Abroad Non-FL ISEP)
 Texas State Self-Service
+May 19th
+Tuesday, 2026
+Last Day to Add a Course (102 - Extension Special)
+(Ends at 3:45 p.m.)
+May 19th
+Tuesday, 2026
+Last Day to Register with $25 Fee (102 - Extension Special)
+May 21st
+Thursday, 2026
+Census (102 - Extension Special)
+May 21st
+Thursday, 2026
+Last Day to Drop a Course with no Record on Transcript  (102 - Extension Special)
+(Ends at 11:59 p.m.)
+Dropping vs Withdrawing
 May 21st
 Thursday, 2026
 Payment Deadline for Summer 2026
@@ -5454,6 +5503,10 @@ Payment Options
 May 22nd
 Friday, 2026
 Last Day for Graduation Candidates to Change Name on Diploma for Spring 2026
+May 22nd
+Friday, 2026
+Roster Certification (102 - Extension Special)
+(Due at noon) Starts on 5/22 and runs through 5/28
 May 25th
 Monday, 2026
 Memorial Day
@@ -5485,6 +5538,9 @@ Classes Begin (First 8 Weeks)
 May 26th
 Tuesday, 2026
 Classes Begin (Full Term)
+May 26th
+Tuesday, 2026
+Classes Begin (SA (Non-FL ISEP))
 May 26th
 Tuesday, 2026
 Classes Begin (Study Abroad 8 Weeks)
@@ -5536,6 +5592,10 @@ Last Day to Add a Course (First 5 Week Session (AP))
 (Ends at 3:45 p.m.)
 May 26th
 Tuesday, 2026
+Last Day to Add a Course (SA (Non-FL ISEP))
+(Ends at 3:45 p.m.)
+May 26th
+Tuesday, 2026
 Last Day to Add a Course (Study Abroad First 3 Weeks)
 (Ends at 3:45 p.m.)
 May 26th
@@ -5565,6 +5625,9 @@ Last Day to Register with $25 Fee (First 4 Weeks)
 May 26th
 Tuesday, 2026
 Last Day to Register with $25 Fee (First 5 Week Session (AP))
+May 26th
+Tuesday, 2026
+Last Day to Register with $25 Fee (SA (Non-FL ISEP))
 May 26th
 Tuesday, 2026
 Last Day to Register with $25 Fee (Study Abroad First 3 Weeks)
@@ -5682,6 +5745,14 @@ May 29th
 Friday, 2026
 Roster Certification (Study Abroad First 4 Weeks)
 (Due at noon) Starts on 5/29 and runs through 6/3
+May 30th
+Saturday, 2026
+Automatic W Deadline (240 - SA 4 Wks (Early Strt))
+May 30th
+Saturday, 2026
+Last Day to Drop a Course (240 - SA 4 Wks (Early Strt))
+(Ends at 11:59 p.m.)
+Dropping vs Withdrawing
 May 30th
 Saturday, 2026
 Roster Certification (First 5 Week Session (AP))
@@ -5815,6 +5886,19 @@ Roster Certification (Study Abroad Second 4 Weeks)
 June 4th
 Thursday, 2026
 Term Ends (1M - 3 Week Intersession)
+June 5th
+Friday, 2026
+Automatic W Deadline (102 - Extension Special)
+June 5th
+Friday, 2026
+Last Day to Drop a Course (102 - Extension Special)
+(Ends at 11:59 p.m.)
+Dropping vs Withdrawing
+June 5th
+Friday, 2026
+Last Day to Withdraw from the University (240 - SA 4 Wks (Early Strt))
+(Ends at 11:59 p.m.)
+Dropping vs Withdrawing
 June 6th
 Saturday, 2026
 Automatic W Deadline (First 3 Weeks)
@@ -5895,12 +5979,20 @@ Wednesday, 2026
 Census (Full Term)
 June 10th
 Wednesday, 2026
+Census (SA (Non-FL ISEP))
+June 10th
+Wednesday, 2026
 Last Day to Drop a Course with no Record on Transcript (10A - 10 Week Session (AP))
 (Ends at 11:59 p.m.)
 Dropping vs Withdrawing
 June 10th
 Wednesday, 2026
 Last Day to Drop a Course with no Record on Transcript (Full Term)
+(Ends at 11:59 p.m.)
+Dropping vs Withdrawing
+June 10th
+Wednesday, 2026
+Last Day to Drop a Course with no Record on Transcript (SA (Non-FL ISEP))
 (Ends at 11:59 p.m.)
 Dropping vs Withdrawing
 June 10th
@@ -5929,6 +6021,13 @@ Thursday, 2026
 Automatic W Deadline (Study Abroad First 4 Weeks)
 June 11th
 Thursday, 2026
+Final Exams (240 - SA 4 Wks (Early Strt))
+Final Exam Schedules
+June 11th
+Thursday, 2026
+Last Day of Classes (240 - SA 4 Wks (Early Strt))
+June 11th
+Thursday, 2026
 Last Day to Drop a Course (First 4 Weeks)
 (Ends at 11:59 p.m.)
 Dropping vs Withdrawing
@@ -5945,6 +6044,13 @@ June 11th
 Thursday, 2026
 Roster Certification (Full Term)
 (Due at noon) Starts on 6/11 and runs through 6/16
+June 11th
+Thursday, 2026
+Roster Certification (SA (Non-FL ISEP))
+(Due at noon) Starts on 6/11 and runs through 6/16
+June 11th
+Thursday, 2026
+Term Ends (240 - SA 4 Wks (Early Strt))
 June 12th
 Friday, 2026
 Automatic W Deadline (First 5 Week Session (AP))
@@ -5979,16 +6085,29 @@ Final Exams (Study Abroad First 3 Weeks)
 Final Exam Schedules
 June 15th
 Monday, 2026
+Grades Due (240 - SA 4 Wks (Early Strt))
+(Due at noon)
+June 15th
+Monday, 2026
 Last Day of Classes (First 3 Weeks)
 June 15th
 Monday, 2026
 Last Day of Classes (Study Abroad First 3 Weeks)
 June 15th
 Monday, 2026
+Last Day to Withdraw from the University (102 - Extension Special)
+(Ends at 11:59 p.m.)
+Dropping vs Withdrawing
+June 15th
+Monday, 2026
 Term Ends (First 3 Weeks)
 June 15th
 Monday, 2026
 Term Ends (Study Abroad First 3 Weeks)
+June 16th
+Tuesday, 2026
+Grades Available (240 - SA 4 Wks (Early Strt))
+Texas State Self-Service
 June 16th
 Tuesday, 2026
 Last Day to Withdraw from the University (First 4 Weeks)
@@ -6057,6 +6176,16 @@ Saturday, 2026
 Last Day to Drop a Course (Study Abroad Second 3 Weeks)
 (Ends at 11:59 p.m.)
 Dropping vs Withdrawing
+June 22nd
+Monday, 2026
+Final Exams  (102 - Extension Special)
+Final Exam Schedules
+June 22nd
+Monday, 2026
+Last Day of Classes (102 - Extension Special)
+June 22nd
+Monday, 2026
+Term Ends (102 - Extension Special)
 June 23rd
 Tuesday, 2026
 Final Exams (First 4 Weeks)
@@ -6114,6 +6243,10 @@ Last Day to Withdraw from the University (Study Abroad Second 3 Weeks)
 Dropping vs Withdrawing
 June 25th
 Thursday, 2026
+Grades Due  (102 - Extension Special)
+(Due at noon)
+June 25th
+Thursday, 2026
 Payment Deadline (5B - Second 5 Week Session (AP))
 Payment Options
 June 26th
@@ -6125,6 +6258,10 @@ Automatic W Deadline (First 8 Weeks)
 June 26th
 Friday, 2026
 Automatic W Deadline (Study Abroad 8 Weeks)
+June 26th
+Friday, 2026
+Grades Available  (102 - Extension Special)
+Texas State Self-Service
 June 26th
 Friday, 2026
 Last Day of Classes (First 5 Week Session (AP))
@@ -6391,6 +6528,9 @@ Friday, 2026
 Automatic W Deadline (Full Term)
 July 3rd
 Friday, 2026
+Automatic W Deadline (SA (Non-FL ISEP))
+July 3rd
+Friday, 2026
 Automatic W Deadline (Study Abroad Main)
 July 3rd
 Friday, 2026
@@ -6437,6 +6577,11 @@ Dropping vs Withdrawing
 July 3rd
 Friday, 2026
 Last Day to Drop a Course (Full Term)
+(Ends at 11:59 p.m.)
+Dropping vs Withdrawing
+July 3rd
+Friday, 2026
+Last Day to Drop a Course (SA (Non-FL ISEP))
 (Ends at 11:59 p.m.)
 Dropping vs Withdrawing
 July 3rd
@@ -6657,6 +6802,11 @@ Grades Due (Third 3 Weeks)
 (Due at noon)
 July 20th
 Monday, 2026
+Last Day to Withdraw from the University (SA (Non-FL ISEP))
+(Ends at 11:59 p.m.)
+Dropping vs Withdrawing
+July 20th
+Monday, 2026
 Last Day to Withdraw from the University (Study Abroad Third 4 Weeks)
 (Ends at 11:59 p.m.)
 Dropping vs Withdrawing
@@ -6853,6 +7003,9 @@ Thursday, 2026
 Last Day of Classes (Full Term)
 July 30th
 Thursday, 2026
+Last Day of Classes (SA (Non-FL ISEP))
+July 30th
+Thursday, 2026
 Last Day of Classes (Second 5 Weeks)
 July 30th
 Thursday, 2026
@@ -6875,6 +7028,10 @@ Final Exam Schedules
 July 31st
 Friday, 2026
 Final Exams (Full Term)
+Final Exam Schedules
+July 31st
+Friday, 2026
+Final Exams (SA (Non-FL ISEP))
 Final Exam Schedules
 July 31st
 Friday, 2026
@@ -6932,6 +7089,9 @@ Friday, 2026
 Term Ends (Full Term)
 July 31st
 Friday, 2026
+Term Ends (SA (Non-FL ISEP))
+July 31st
+Friday, 2026
 Term Ends (Second 5 Weeks)
 July 31st
 Friday, 2026
@@ -6960,6 +7120,10 @@ Grades Due (5B - Second 5 Week Session (AP))
 August 3rd
 Monday, 2026
 Grades Due (Full Term)
+(Due at noon)
+August 3rd
+Monday, 2026
+Grades Due (SA (Non-FL ISEP))
 (Due at noon)
 August 3rd
 Monday, 2026
@@ -6992,6 +7156,10 @@ Texas State Self-Service
 August 4th
 Tuesday, 2026
 Grades Available (Full Term)
+Texas State Self-Service
+August 4th
+Tuesday, 2026
+Grades Available (SA (Non-FL ISEP))
 Texas State Self-Service
 August 4th
 Tuesday, 2026
@@ -7355,6 +7523,10 @@ Thursday, 2026
 Classes Begin (Second 8 Weeks)
 October 8th
 Thursday, 2026
+Fall Break
+Starts on 10/8 and runs through 10/9
+October 8th
+Thursday, 2026
 Last Day to Add a Course (Second 8 Week Session (AP))
 (Ends at 3:45 p.m.)
 October 8th
@@ -7383,10 +7555,6 @@ October 13th
 Tuesday, 2026
 Grades Available (First 8 Weeks)
 Texas State Self-Service
-October 15th
-Thursday, 2026
-Fall Break
-Starts on 10/15 and runs through 10/16
 October 19th
 Monday, 2026
 Census (Second 8 Week Session (AP))
