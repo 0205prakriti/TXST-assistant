@@ -2,7 +2,7 @@ from llm.client import chat
 
 def run(user_message: str, history: list = []) -> str:
     with open("context/campus.txt", "r", encoding="utf-8") as f:
-        context = f.read()
+        context = f.read(3000)
 
     system = f"""You are the Campus Agent for Texas State University.
 Answer student questions about campus life, dining, parking, facilities, and services.
