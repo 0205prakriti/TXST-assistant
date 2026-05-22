@@ -1,21 +1,20 @@
 import os
-from google import genai
+from groq import Groq
 from dotenv import load_dotenv
 
 load_dotenv()
 
-client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
+client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
 def chat(messages: list, system: str = "") -> str:
-    full_prompt = ""
+    full_messages = []
     if system:
-        full_prompt += f"{system}\n\n"
-    for msg in messages:
-        role = "User" if msg["role"] == "user" else "Assistant"
-        full_prompt += f"{role}: {msg['content']}\n"
+        full_messages.append({"role": "system", "content": system})
+    full_messages.extend(messages)
 
-    response = client.models.generate_content(
-        model="gemini-2.0-flash",
-        contents=full_prompt
+    response = client.chat.completions.create(
+        model="llama-3.3-70b-versatile",
+        max_tokens=1000,
+        messages=full_messages
     )
-    return response.text.strip()
+    return response.choices[0].message.content.strip()
