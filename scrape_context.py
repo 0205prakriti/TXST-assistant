@@ -30,6 +30,11 @@ pages = {
         "https://www.studentsuccess.txst.edu/departments/support-services/dining.html",
         "https://parking.txst.edu/regulations",
         "https://www.library.txst.edu/about/directions-parking.html",
+    ],
+    "context/financial_aid.txt": [
+        "https://www.finaid.txst.edu/",
+        "https://www.finaid.txst.edu/typesofaid/",
+        "https://www.finaid.txst.edu/applying/",
     ]
 }
 
