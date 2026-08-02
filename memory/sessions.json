@@ -1,3 +1,36 @@
 {
-  "history": []
+  "history": [
+    {
+      "role": "user",
+      "content": "k cha?"
+    },
+    {
+      "role": "assistant",
+      "content": "I'm not sure I understood that \u2014 could you clarify if you're asking about **academics**, **campus life**, or **financial aid**?"
+    },
+    {
+      "role": "user",
+      "content": "aid"
+    },
+    {
+      "role": "assistant",
+      "content": "You're looking for information about financial aid at Texas State University. What specific aspect of financial aid would you like to know about? We have:\n\n1. **Scholarships**: Guaranteed undergraduate scholarships for qualifying new, incoming students, including Assured Scholarships.\n2. **Loans**: Federal student loans and other loan options.\n3. **Grants**: Federal, state, and institutional grants.\n4. **FAFSA**: Free Application for Federal Student Aid.\n5. **Financial Aid Process**: How to apply, eligibility, and disbursement.\n\nPlease let me know which one you'd like more information about, or if you have a specific question."
+    },
+    {
+      "role": "user",
+      "content": "how do I get 100% scholarship?"
+    },
+    {
+      "role": "assistant",
+      "content": "While there isn't a straightforward way to guarantee a 100% scholarship, I can provide you with some information about the types of scholarships offered at Texas State University.\n\n**Assured Scholarships** are guaranteed undergraduate scholarships for qualifying new, incoming students. However, the amount of the scholarship varies depending on the student's eligibility and academic performance.\n\nTo be considered for scholarships, you'll need to:\n\n1. **Apply for admission** to Texas State University.\n2. **Complete the FAFSA** (Free Application for Federal Student Aid) to determine your eligibility for federal, state, and institutional aid.\n3. **Submit additional scholarship applications**, if required, for specific scholarships.\n\nSome scholarships, like the **Bobcat Promise**, aim to help guarantee access to higher education for Texas children, regardless of their family's financial resources. However, these scholarships may not cover 100% of the costs.\n\nTo increase your chances of receiving a significant scholarship, focus on:\n\n* **Maintaining a strong academic record**, especially in high school.\n* **Scoring well on standardized tests**, such as the SAT or ACT.\n* **Demonstrating financial need** by completing the FAFSA.\n* **Applying for external scholarships** and submitting additional applications, if required.\n\nKeep in mind that scholarship availability and eligibility criteria may vary from year to year. I recommend checking the Texas State University financial aid website for the most up-to-date information on scholarships and applying as early as possible to increase your chances of receiving aid.\n\nWould you like more information on a specific type of scholarship or the application process?"
+    },
+    {
+      "role": "user",
+      "content": "What are the dining hall hours?"
+    },
+    {
+      "role": "assistant",
+      "content": "The Lyndon B. Johnson Student Center has several dining options with varying hours of operation. Here are the hours for each dining location:\n\n1. **Chick-fil-A**:\n\t* Monday - Wednesday: 7:30am - 12:00am\n\t* Thursday: 7:30am - 10:00pm\n\t* Friday: 7:30am - 5:00pm\n\t* Saturday: 10:30am - 5:00pm\n\t* Sunday: Closed\n2. **Starbucks**:\n\t* Monday - Wednesday: 7:00am - 10:00pm\n\t* Thursday: 7:00am - 8:00pm\n\t* Friday: 7:00am - 2:00pm\n\t* Saturday and Sunday: Closed\n3. **Tu Taco**:\n\t* Monday - Thursday: 10:30am - 8:00pm\n\t* Friday, Saturday, and Sunday: Closed\n4. **LBJ Marketplace**:\n\t* Monday - Thursday: 7:30am - 10:00pm\n\t* Friday: 7:30am - 5:00pm\n\t* Saturday and Sunday: 10:30am - 5:00pm\n5. **Revolution Noodle**:\n\t* Monday - Thursday: 9:00am - 8:00pm\n\t* Friday, Saturday, and Sunday: Closed\n6. **Blends & Bowls**:\n\t* Monday - Thursday: 10:30am - 7:00pm\n\t* Friday, Saturday, and Sunday: Closed\n7. **Pizza Hut**:\n\t* Monday - Thursday: 10:30am - 9:00pm\n\t* Friday, Saturday, and Sunday: Closed\n8. **Burger 512**:\n\t* Monday - Thursday: 10:30am - 8:00pm\n\t* Friday: 10:30am - 2:00pm\n\t* Saturday and Sunday: Closed\n9. **Global Evolution**:\n\t* Monday - Thursday: 8:00am - 4:00pm\n\t* Friday, Saturday, and Sunday: Closed\n10. **George's**:\n\t* Monday - Thursday: 10:00am - 11:30pm\n\t* Friday: 10:00am - 10:00pm\n\t* Saturday: 12:00pm - 10:00pm\n\t* Sunday: Closed\n\nPlease note that these hours are subject to change, and it's always a good idea to check the Texas State University website or the dining services website for the most up-to-date information."
+    }
+  ]
 }
