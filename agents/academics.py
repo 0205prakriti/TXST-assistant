@@ -7,11 +7,10 @@ def run(user_message: str, history: list = []) -> str:
 
     recent_history = history[-6:] if len(history) > 6 else history
 
-    system = f"""You are the Academics Agent for Texas State University.
-Answer student questions using the tool results below.
-Be specific and helpful. If something isn't in the context, say so honestly.
-
-TOOL RESULTS:
+    system = f"""...
+Be concise — answer in 3-5 sentences unless the question needs more detail.
+Avoid tables and long lists unless specifically asked.
+CONTEXT:
 {context}"""
 
     messages = recent_history + [{"role": "user", "content": user_message}]
