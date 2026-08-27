@@ -1,8 +1,8 @@
 from llm.client import chat
+from tools.tool_runner import run_tool
 
 def run(user_message: str, history: list = []) -> str:
-    with open("context/campus.txt", "r", encoding="utf-8") as f:
-        context = f.read(6000)
+    context = run_tool(user_message, agent_type="campus")
 
     recent_history = history[-6:] if len(history) > 6 else history
 
@@ -10,7 +10,7 @@ def run(user_message: str, history: list = []) -> str:
 Answer student questions about campus life, dining, parking, facilities, and services.
 Be specific and helpful. If something isn't in the context, say so honestly.
 
-CONTEXT:
+TOOL RESULTS:
 {context}"""
 
     messages = recent_history + [{"role": "user", "content": user_message}]

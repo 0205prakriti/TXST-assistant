@@ -13,7 +13,7 @@ def chat(messages: list, system: str = "") -> str:
     full_messages.extend(messages)
 
     response = client.chat.completions.create(
-        model="llama-3.3-70b-versatile",
+        model="openai/gpt-oss-120b",
         max_tokens=1000,
         messages=full_messages
     )
