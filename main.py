@@ -111,8 +111,11 @@ if prompt := st.chat_input("Ask about academics, campus life, or financial aid..
                 response = academics.run(prompt, st.session_state.history)
             elif agent == "FINANCIAL_AID":
                 response = financial_aid.run(prompt, st.session_state.history)
-            else:
+            elif agent == "CAMPUS":
                 response = campus.run(prompt, st.session_state.history)
+            else:
+                from agents import general
+                response = general.run(prompt, st.session_state.history)
         agent_display = agent
 
     st.session_state.history.append({"role": "assistant", "content": response})
