@@ -5,5 +5,7 @@ requests
 beautifulsoup4
 groq
 fastapi
+uvicorn
 duckduckgo_search
 chromadb
+sentence-transformers

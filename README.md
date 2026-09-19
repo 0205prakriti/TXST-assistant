@@ -14,6 +14,8 @@ The project demonstrates multi-agent orchestration, semantic search, REST API de
 - Semantic search using ChromaDB vector database
 - Provider-agnostic LLM integration (Groq, OpenAI, Gemini)
 - Persistent conversation memory
+- Session-isolated conversation history in the API and Streamlit UI
+- Official source links in grounded answers when source material is available
 - FastAPI backend with REST API
 - Streamlit web interface
 - Knowledge base generated from Texas State University resources
@@ -117,12 +119,33 @@ Create a `.env` file:
 GROQ_API_KEY=YOUR_API_KEY
 ```
 
-Generate the knowledge base:
+Generate the knowledge base (also rerun these commands after pulling changes so existing indexes gain source metadata):
 
 ```bash
 python scrape_context.py
 python rag/embedder.py
 ```
+
+To refresh only financial aid, use:
+
+```bash
+python scrape_context.py --domain financial_aid
+python rag/embedder.py --domain financial_aid
+```
+
+Financial aid sources cover applications, BOSS scholarships, eligibility, verification,
+SAP, disbursement, grants, loans, work-study, Bobcat Promise, and summer aid on TXST
+One Stop. Source URLs and fetch times are saved in `context/financial_aid.sources.json`.
+A fetch time records when the page was collected; it does not establish when a policy
+took effect. Failed source downloads stop the refresh before replacing the domain's
+existing text. Rebuild the index after each successful refresh.
+
+Retrieval combines semantic search with keyword matching so specific topics such as
+disbursement can outrank generic eligibility text. Financial aid replies use brief
+official excerpts rather than generated paraphrases. Each excerpt must match its
+attributed source text before display; invented wording or source links trigger a
+fallback to official pages. This prevents added steps or requirements, though source
+selection and the freshness of the university's pages still need review.
 
 Run the backend:
 
@@ -143,9 +166,9 @@ streamlit run main.py
 | Method | Endpoint   | Description                   |
 | ------ | ---------- | ----------------------------- |
 | GET    | `/`        | API status                    |
-| POST   | `/chat`    | Send a user query             |
-| GET    | `/history` | Retrieve conversation history |
-| DELETE | `/history` | Clear conversation history    |
+| POST   | `/chat`    | Send a message; returns a `session_id` |
+| GET    | `/history?session_id=...` | Retrieve that session's history |
+| DELETE | `/history?session_id=...` | Clear that session's history |
 | GET    | `/health`  | Service health check          |
 
 Interactive API documentation is available at:
@@ -153,6 +176,8 @@ Interactive API documentation is available at:
 ```
 http://localhost:8000/docs
 ```
+
+Send the returned `session_id` with later `/chat` requests to continue a conversation. Omitting it starts a new session. Session IDs separate local histories; they are not authentication. Add user authentication and a managed database before exposing history endpoints publicly.
 
 ---
 
@@ -190,6 +215,27 @@ This project provided hands-on experience with:
 - Docker support
 - Cloud deployment
 - Expanded university knowledge sources
+
+## Verification
+
+Install `pytest` and `httpx` into your development environment, then run the offline
+API and source-ingestion checks:
+
+```bash
+python -m pytest -q tests/test_api.py tests/test_sources.py tests/test_grounding.py
+```
+
+For a live check of eight financial aid questions through the API:
+
+```bash
+python -m scripts.evaluate_financial_aid
+```
+
+The live check uses your configured Groq key and may call web search. It stores its
+conversations temporarily, leaving saved student chats untouched. Its citation
+check detects links absent from the retrieved material; review the printed answers
+against the sources to assess factual support. The existing routing tests also
+make live model calls.
 
 ---
 

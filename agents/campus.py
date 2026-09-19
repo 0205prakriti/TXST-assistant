@@ -1,16 +1,13 @@
 from llm.client import chat
 from tools.tool_runner import run_tool
+from agents.prompt import grounded_prompt
 
-def run(user_message: str, history: list = []) -> str:
+def run(user_message: str, history: list | None = None) -> str:
     context = run_tool(user_message, agent_type="campus")
 
-    recent_history = history[-6:] if len(history) > 6 else history
+    recent_history = (history or [])[-6:]
 
-    system = f"""...
-Be concise — answer in 3-5 sentences unless the question needs more detail.
-Avoid tables and long lists unless specifically asked.
-CONTEXT:
-{context}"""
+    system = grounded_prompt("campus life", context)
 
     messages = recent_history + [{"role": "user", "content": user_message}]
     return chat(messages=messages, system=system)

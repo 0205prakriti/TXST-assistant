@@ -1,7 +1,7 @@
 from llm.client import chat
 
-def run(user_message: str, history: list = []) -> str:
-    recent_history = history[-6:] if len(history) > 6 else history
+def run(user_message: str, history: list | None = None) -> str:
+    recent_history = (history or [])[-6:]
 
     system = """You are a friendly campus assistant for Texas State University.
 For casual greetings, respond warmly and tell the user what you can help with.

@@ -31,7 +31,7 @@ or
 
     try:
         return json.loads(response)
-    except:
+    except (ValueError, TypeError):
         return {"tool": "search_knowledge_base", "query": user_message}
 
 
@@ -40,12 +40,14 @@ def run_tool(user_message: str, agent_type: str) -> str:
     decision = decide_tool(user_message, agent_type)
     tool_name = decision.get("tool", "search_knowledge_base")
     query = decision.get("query", user_message)
+    if not isinstance(query, str) or not query.strip():
+        query = user_message
 
     print(f"  🔧 Tool selected: {tool_name}")
     print(f"  🔍 Query: {query}")
 
     if tool_name == "search_web":
-        return search_web(query)
+        return search_web(f"site:txst.edu OR site:txstate.edu {query}")
     else:
         collection = agent_type.lower().replace(" ", "_")
         return retrieve(query, collection_name=collection, n_results=3)

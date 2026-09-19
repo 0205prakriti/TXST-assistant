@@ -1,8 +1,10 @@
 import streamlit as st
 import os
-from orchestrator import route
-from agents import academics, campus, financial_aid
-from memory.memory import load_history, save_history
+from uuid import uuid4
+from groq import RateLimitError
+from chat_service import answer
+from memory.memory import load_history, clear_history
+from chat_format import compact_saved_answer
 
 # Page config
 st.set_page_config(
@@ -72,12 +74,14 @@ with st.sidebar:
     st.divider()
     if st.button("🗑️ Clear Conversation"):
         st.session_state.history = []
-        save_history([])
+        clear_history(st.session_state.session_id)
         st.rerun()
 
 # Load history
+if "session_id" not in st.session_state:
+    st.session_state.session_id = str(uuid4())
 if "history" not in st.session_state:
-    st.session_state.history = load_history()
+    st.session_state.history = load_history(st.session_state.session_id)
 
 AGENT_ICONS = {
     "ACADEMICS": "🎓",
@@ -89,7 +93,7 @@ AGENT_ICONS = {
 for msg in st.session_state.history:
     avatar = "🧑‍🎓" if msg["role"] == "user" else "🐱"
     with st.chat_message(msg["role"], avatar=avatar):
-        st.write(msg["content"])
+        st.write(compact_saved_answer(msg["content"]) if msg["role"] == "assistant" else msg["content"])
 
 # Chat input
 if prompt := st.chat_input("Ask about academics, campus life, or financial aid..."):
@@ -97,34 +101,23 @@ if prompt := st.chat_input("Ask about academics, campus life, or financial aid..
     with st.chat_message("user", avatar="🧑‍🎓"):
         st.write(prompt)
 
-    with st.spinner("Routing your question..."):
-        result = route(prompt)
+    with st.spinner("Finding an answer..."):
+        try:
+            result = answer(prompt, st.session_state.session_id)
+        except RateLimitError:
+            st.session_state.history.pop()
+            st.error("The assistant is temporarily busy. Please try again in a minute.")
+            st.stop()
         agent = result["agent"]
         confidence = result["confidence"]
-
-    if confidence < 0.6:
-        response = "I'm not sure I understood that — could you clarify if you're asking about **academics**, **campus life**, or **financial aid**?"
-        agent_display = None
-    else:
-        with st.spinner(f"{AGENT_ICONS.get(agent, '🤖')} {agent.replace('_', ' ').title()} agent is thinking..."):
-            if agent == "ACADEMICS":
-                response = academics.run(prompt, st.session_state.history)
-            elif agent == "FINANCIAL_AID":
-                response = financial_aid.run(prompt, st.session_state.history)
-            elif agent == "CAMPUS":
-                response = campus.run(prompt, st.session_state.history)
-            else:
-                from agents import general
-                response = general.run(prompt, st.session_state.history)
-        agent_display = agent
+        response = compact_saved_answer(result["response"])
+        agent_display = agent if confidence >= 0.6 else None
 
     st.session_state.history.append({"role": "assistant", "content": response})
     with st.chat_message("assistant", avatar="🐱"):
         if agent_display:
             st.markdown(
-                f'<span class="agent-badge">{AGENT_ICONS.get(agent_display, "🤖")} {agent_display.replace("_", " ").title()} · {int(confidence*100)}% confidence</span>',
+                f'<span class="agent-badge">{AGENT_ICONS.get(agent_display, "🤖")} {agent_display.replace("_", " ").title()}</span>',
                 unsafe_allow_html=True
             )
         st.write(response)
-
-    save_history(st.session_state.history)

@@ -1,10 +1,10 @@
 # api.py
-from fastapi import FastAPI
+from fastapi import FastAPI, Query, HTTPException
+from groq import RateLimitError
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
-from orchestrator import route
-from agents import academics, campus, financial_aid
-from memory.memory import load_history, save_history, clear_history
+from pydantic import BaseModel, Field
+from chat_service import answer
+from memory.memory import load_history, clear_history
 
 app = FastAPI(
     title="TXST Campus Assistant API",
@@ -15,19 +15,21 @@ app = FastAPI(
 # allow Streamlit and future React frontend to call this API
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["http://localhost:8501", "http://127.0.0.1:8501"],
     allow_methods=["*"],
     allow_headers=["*"]
 )
 
 # request/response models
 class ChatRequest(BaseModel):
-    message: str
+    message: str = Field(min_length=1, max_length=4000)
+    session_id: str | None = None
 
 class ChatResponse(BaseModel):
     response: str
     agent: str
     confidence: float
+    session_id: str
 
 # endpoints
 @app.get("/")
@@ -36,35 +38,18 @@ def root():
 
 @app.post("/chat", response_model=ChatResponse)
 def chat(request: ChatRequest):
-    history = load_history()
-    
-    result = route(request.message)
-    agent = result["agent"]
-    confidence = result["confidence"]
-
-    if confidence < 0.6:
-        response = "Could you clarify — are you asking about academics, campus life, or financial aid?"
-    elif agent == "ACADEMICS":
-        response = academics.run(request.message, history)
-    elif agent == "FINANCIAL_AID":
-        response = financial_aid.run(request.message, history)
-    else:
-        response = campus.run(request.message, history)
-
-    # save to memory
-    history.append({"role": "user", "content": request.message})
-    history.append({"role": "assistant", "content": response})
-    save_history(history)
-
-    return ChatResponse(response=response, agent=agent, confidence=confidence)
+    try:
+        return ChatResponse(**answer(request.message, request.session_id))
+    except RateLimitError as exc:
+        raise HTTPException(status_code=429, detail="The assistant is temporarily busy. Please try again in a minute.") from exc
 
 @app.get("/history")
-def get_history():
-    return {"history": load_history()}
+def get_history(session_id: str = Query(...)):
+    return {"history": load_history(session_id)}
 
 @app.delete("/history")
-def delete_history():
-    clear_history()
+def delete_history(session_id: str = Query(...)):
+    clear_history(session_id)
     return {"status": "cleared"}
 
 @app.get("/health")
