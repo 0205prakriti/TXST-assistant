@@ -1,3 +1,4 @@
+# Manual smoke script (needs GROQ_API_KEY). Lives in scripts/ so pytest does not collect it.
 from agents.academics import run as academics
 from agents.campus import run as campus
 

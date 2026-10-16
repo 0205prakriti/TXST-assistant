@@ -4,3 +4,5 @@ __pycache__/
 *.pyc
 chroma_db/
 *.dylib
+# never commit real user chat history
+memory/sessions.json

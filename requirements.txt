@@ -1,11 +1,14 @@
-google-genai
-streamlit
-python-dotenv
-requests
-beautifulsoup4
-groq
-fastapi
-uvicorn
-duckduckgo_search
-chromadb
-sentence-transformers
+# Pinned via pip's resolver on 2026-10-15 (Python 3.12) — install with: pip install -r requirements.txt
+google-genai==2.31.0
+streamlit==1.66.0
+python-dotenv==1.2.4
+requests==2.34.2
+beautifulsoup4==4.15.0
+groq==1.7.0
+fastapi==0.143.2
+uvicorn==0.54.0
+duckduckgo_search==8.1.1
+chromadb==1.5.9
+sentence-transformers==6.1.0
+pytest==9.1.1
+httpx==0.28.1
