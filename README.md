@@ -167,6 +167,7 @@ streamlit run main.py
 | ------ | ---------- | ----------------------------- |
 | GET    | `/`        | API status                    |
 | POST   | `/chat`    | Send a message; returns a `session_id` |
+| GET    | `/chat/stream?message=...` | Stream the reply as server-sent events (meta, token, done) |
 | GET    | `/history?session_id=...` | Retrieve that session's history |
 | DELETE | `/history?session_id=...` | Clear that session's history |
 | GET    | `/health`  | Service health check          |

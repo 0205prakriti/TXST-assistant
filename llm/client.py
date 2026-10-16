@@ -18,3 +18,22 @@ def chat(messages: list, system: str = "") -> str:
         messages=full_messages
     )
     return response.choices[0].message.content.strip()
+
+
+def chat_stream(messages: list, system: str = ""):
+    """Yield response tokens as they arrive (Groq streaming)."""
+    full_messages = []
+    if system:
+        full_messages.append({"role": "system", "content": system})
+    full_messages.extend(messages)
+
+    stream = client.chat.completions.create(
+        model="openai/gpt-oss-120b",
+        max_tokens=1000,
+        messages=full_messages,
+        stream=True,
+    )
+    for chunk in stream:
+        delta = chunk.choices[0].delta.content
+        if delta:
+            yield delta

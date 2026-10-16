@@ -2,7 +2,7 @@ import streamlit as st
 import os
 from uuid import uuid4
 from groq import RateLimitError
-from chat_service import answer
+from chat_service import answer_stream
 from memory.memory import load_history, clear_history
 from chat_format import compact_saved_answer
 
@@ -101,23 +101,23 @@ if prompt := st.chat_input("Ask about academics, campus life, or financial aid..
     with st.chat_message("user", avatar="🧑‍🎓"):
         st.write(prompt)
 
-    with st.spinner("Finding an answer..."):
-        try:
-            result = answer(prompt, st.session_state.session_id)
-        except RateLimitError:
-            st.session_state.history.pop()
-            st.error("The assistant is temporarily busy. Please try again in a minute.")
-            st.stop()
-        agent = result["agent"]
-        confidence = result["confidence"]
-        response = compact_saved_answer(result["response"])
-        agent_display = agent if confidence >= 0.6 else None
+    try:
+        meta, tokens = answer_stream(prompt, st.session_state.session_id)
+    except RateLimitError:
+        st.session_state.history.pop()
+        st.error("The assistant is temporarily busy. Please try again in a minute.")
+        st.stop()
+    agent = meta["agent"]
+    confidence = meta["confidence"]
+    agent_display = agent if confidence >= 0.6 else None
 
-    st.session_state.history.append({"role": "assistant", "content": response})
     with st.chat_message("assistant", avatar="🐱"):
         if agent_display:
             st.markdown(
                 f'<span class="agent-badge">{AGENT_ICONS.get(agent_display, "🤖")} {agent_display.replace("_", " ").title()}</span>',
                 unsafe_allow_html=True
             )
-        st.write(response)
+        response = st.write_stream(tokens)
+
+    response = compact_saved_answer(response)
+    st.session_state.history.append({"role": "assistant", "content": response})

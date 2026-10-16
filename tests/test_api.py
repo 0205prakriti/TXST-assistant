@@ -57,3 +57,19 @@ def test_delete_history(monkeypatch, tmp_path):
     assert response.json()["status"] == "cleared"
     assert memory.load_history("one") == []
     assert len(memory.load_history("two")) == 1
+
+def test_chat_stream_emits_sse_events(monkeypatch):
+    def fake_stream(message, session_id=None):
+        def gen():
+            yield "Hello"
+            yield " world"
+        return {"agent": "CAMPUS", "confidence": 0.9, "session_id": "s1"}, gen()
+    monkeypatch.setattr("api.answer_stream", fake_stream)
+    response = client.get("/chat/stream", params={"message": "hi"})
+    assert response.status_code == 200
+    assert "text/event-stream" in response.headers["content-type"]
+    body = response.text
+    assert '"type": "meta"' in body
+    assert '"type": "token"' in body
+    assert '"type": "done"' in body
+    assert "Hello" in body
