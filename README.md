@@ -18,6 +18,7 @@ The project demonstrates multi-agent orchestration, semantic search, REST API de
 - Official source links in grounded answers when source material is available
 - FastAPI backend with REST API
 - Streamlit web interface
+- Thumbs up/down feedback on answers, logged to SQLite
 - Knowledge base generated from Texas State University resources
 
 ---

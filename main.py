@@ -5,6 +5,7 @@ from groq import RateLimitError
 from chat_service import answer_stream
 from memory.memory import load_history, clear_history
 from chat_format import compact_saved_answer
+from feedback import log_feedback
 
 # Page config
 st.set_page_config(
@@ -89,11 +90,33 @@ AGENT_ICONS = {
     "FINANCIAL_AID": "💰"
 }
 
+def feedback_buttons(idx, question, answer, agent=None):
+    """Thumbs up/down under an assistant answer; one vote per message."""
+    voted = st.session_state.setdefault("voted", set())
+    if idx in voted:
+        st.caption("✓ Thanks for your feedback!")
+        return
+    col1, col2, _ = st.columns([1, 1, 8])
+    with col1:
+        if st.button("👍", key=f"fb_up_{idx}", help="Good answer"):
+            log_feedback(question, answer, "up", st.session_state.session_id, agent)
+            voted.add(idx)
+            st.rerun()
+    with col2:
+        if st.button("👎", key=f"fb_down_{idx}", help="Bad answer"):
+            log_feedback(question, answer, "down", st.session_state.session_id, agent)
+            voted.add(idx)
+            st.rerun()
+
 # Display chat history
-for msg in st.session_state.history:
+history = st.session_state.history
+for i, msg in enumerate(history):
     avatar = "🧑‍🎓" if msg["role"] == "user" else "🐱"
     with st.chat_message(msg["role"], avatar=avatar):
         st.write(compact_saved_answer(msg["content"]) if msg["role"] == "assistant" else msg["content"])
+        if msg["role"] == "assistant":
+            question = history[i - 1]["content"] if i > 0 and history[i - 1]["role"] == "user" else ""
+            feedback_buttons(i, question, msg["content"])
 
 # Chat input
 if prompt := st.chat_input("Ask about academics, campus life, or financial aid..."):
@@ -119,5 +142,6 @@ if prompt := st.chat_input("Ask about academics, campus life, or financial aid..
             )
         response = st.write_stream(tokens)
 
-    response = compact_saved_answer(response)
-    st.session_state.history.append({"role": "assistant", "content": response})
+        response = compact_saved_answer(response)
+        st.session_state.history.append({"role": "assistant", "content": response})
+        feedback_buttons(len(st.session_state.history) - 1, prompt, response, agent_display)

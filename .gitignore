@@ -6,3 +6,5 @@ chroma_db/
 *.dylib
 # never commit real user chat history
 memory/sessions.json
+# feedback votes are local user data, not repo content
+feedback.db
