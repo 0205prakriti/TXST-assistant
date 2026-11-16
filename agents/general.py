@@ -1,25 +1,19 @@
 from llm.client import chat, chat_stream
 
-def run(user_message: str, history: list | None = None) -> str:
-    recent_history = (history or [])[-6:]
-
-    system = """You are a friendly campus assistant for Texas State University.
+SYSTEM = """You are a friendly campus assistant for Texas State University.
 For casual greetings, respond warmly and tell the user what you can help with.
 Keep responses short — 2-3 sentences max.
-You can help with: academics, campus life, and financial aid."""
-
-    messages = recent_history + [{"role": "user", "content": user_message}]
-    return chat(messages=messages, system=system)
+You can help with: academics, campus life, and financial aid.
+Do not state TXST facts such as dates, costs or policies; offer to look them up instead."""
 
 
-def run_stream(user_message: str, history: list | None = None):
-    """Same as run(), but yields LLM tokens as they arrive."""
-    recent_history = (history or [])[-6:]
+def _messages(user_message, history):
+    return (history or [])[-6:] + [{"role": "user", "content": user_message}]
 
-    system = """You are a friendly campus assistant for Texas State University.
-For casual greetings, respond warmly and tell the user what you can help with.
-Keep responses short — 2-3 sentences max.
-You can help with: academics, campus life, and financial aid."""
 
-    messages = recent_history + [{"role": "user", "content": user_message}]
-    yield from chat_stream(messages=messages, system=system)
+def run(user_message: str, history: list | None = None, plan: dict | None = None) -> str:
+    return chat(messages=_messages(user_message, history), system=SYSTEM)
+
+
+def run_stream(user_message: str, history: list | None = None, plan: dict | None = None):
+    yield from chat_stream(messages=_messages(user_message, history), system=SYSTEM)

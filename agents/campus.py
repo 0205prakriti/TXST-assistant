@@ -1,25 +1,11 @@
-from llm.client import chat, chat_stream
-from tools.tool_runner import run_tool
-from agents.prompt import grounded_prompt
+from agents import generative
 
-def run(user_message: str, history: list | None = None) -> str:
-    context = run_tool(user_message, agent_type="campus")
-
-    recent_history = (history or [])[-6:]
-
-    system = grounded_prompt("campus life", context)
-
-    messages = recent_history + [{"role": "user", "content": user_message}]
-    return chat(messages=messages, system=system)
+DOMAIN, COLLECTION = "campus life", "campus"
 
 
-def run_stream(user_message: str, history: list | None = None):
-    """Same as run(), but yields LLM tokens as they arrive."""
-    context = run_tool(user_message, agent_type="campus")
+def run(user_message: str, history: list | None = None, plan: dict | None = None) -> str:
+    return generative.answer(DOMAIN, COLLECTION, user_message, history, plan)
 
-    recent_history = (history or [])[-6:]
 
-    system = grounded_prompt("campus life", context)
-
-    messages = recent_history + [{"role": "user", "content": user_message}]
-    yield from chat_stream(messages=messages, system=system)
+def run_stream(user_message: str, history: list | None = None, plan: dict | None = None):
+    yield from generative.answer_stream(DOMAIN, COLLECTION, user_message, history, plan)
