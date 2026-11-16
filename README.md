@@ -9,7 +9,8 @@ The project demonstrates multi-agent orchestration, semantic search, REST API de
 ## Key Features
 
 - Multi-agent architecture with specialized AI agents
-- Confidence-based orchestrator for intelligent task routing
+- Conversation-aware planner: one model call routes the turn, rewrites follow-ups into
+  standalone search queries, and picks the tool
 - Retrieval-Augmented Generation (RAG)
 - Semantic search using ChromaDB vector database
 - Provider-agnostic LLM integration (Groq, OpenAI, Gemini)
@@ -26,27 +27,26 @@ The project demonstrates multi-agent orchestration, semantic search, REST API de
 ## System Architecture
 
 ```
-User Query
+User message + recent conversation
      │
      ▼
-Orchestrator
-(Intent Classification)
+Planner (orchestrator.plan, one JSON-mode call)
+  → agent, confidence, standalone_query, tool
      │
-     ├───────────────┐
-     ▼               ▼
-Academic Agent   Campus Agent
-                     │
-                     ▼
-            Financial Aid Agent
-                     │
-                     ▼
-       ChromaDB Semantic Retrieval
-                     │
-                     ▼
-              Large Language Model
-                     │
-                     ▼
-          FastAPI Backend + Streamlit UI
+     ├──────────────┬────────────────┬──────────────┐
+     ▼              ▼                ▼              ▼
+Academics       Campus        Financial Aid      General
+     │              │                │
+     └──────┬───────┘                │
+            ▼                        ▼
+  Hybrid retrieval (ChromaDB + BM25) on the standalone query
+            │                        │
+            ▼                        ▼
+  Grounded LLM answer        Verified source excerpts
+            │                        │
+            └───────────┬────────────┘
+                        ▼
+          FastAPI backend + Streamlit UI
 ```
 
 ---
@@ -60,7 +60,7 @@ Academic Agent   Campus Agent
 | Frontend        | Streamlit            |
 | Vector Database | ChromaDB             |
 | Embedding Model | all-MiniLM-L6-v2     |
-| LLM Provider    | Groq (Llama 3.3-70B) |
+| LLM Provider    | Groq (`openai/gpt-oss-120b` by default, set `LLM_MODEL`) |
 | Memory          | JSON Session Storage |
 | Web Scraping    | BeautifulSoup        |
 | API Server      | Uvicorn              |
@@ -118,6 +118,10 @@ Create a `.env` file:
 
 ```env
 GROQ_API_KEY=YOUR_API_KEY
+# Optional
+LLM_MODEL=openai/gpt-oss-120b
+LLM_TIMEOUT_SECONDS=30
+LLM_MAX_RETRIES=2
 ```
 
 Generate the knowledge base (also rerun these commands after pulling changes so existing indexes gain source metadata):
@@ -186,8 +190,10 @@ Send the returned `session_id` with later `/chat` requests to continue a convers
 ## How It Works
 
 1. A user submits a question through the Streamlit interface.
-2. The orchestrator analyzes the request and determines the most appropriate domain-specific agent.
-3. The selected agent retrieves relevant context from the ChromaDB vector database.
+2. The planner reads the message with the last few turns of the conversation and, in one
+   call, picks the agent, rewrites follow-ups ("what about spring?") into a standalone
+   query, and chooses a tool.
+3. The selected agent searches the knowledge base with that standalone query.
 4. The retrieved context is combined with the user's question and sent to the configured language model.
 5. The generated response is returned through the FastAPI backend and displayed to the user.
 
@@ -220,26 +226,44 @@ This project provided hands-on experience with:
 
 ## Verification
 
-Install `pytest` and `httpx` into your development environment, then run the offline
-API and source-ingestion checks:
+Run the offline tests (no API key needed; live model tests are skipped):
 
 ```bash
-python -m pytest -q tests/test_api.py tests/test_sources.py tests/test_grounding.py
+python -m pytest -q
 ```
 
-For a live check of eight financial aid questions through the API:
+### Evaluation set
+
+`evals/golden.jsonl` holds 155 student questions across financial aid, academics and
+campus, including 15 multi-turn follow-ups, personal-record questions, out-of-scope
+requests and a prompt-injection attempt. Each case lists the official pages that
+should support the answer, and short facts the answer must contain. A test checks
+every required fact against the scraped source text, so the set cannot drift away
+from the knowledge base. When a page is re-scraped and a fact changes, that test
+fails and points at the case to update.
+
+```bash
+# Retrieval only: hit@1, hit@3, MRR. Offline, needs the Chroma index, no API key.
+python -m scripts.run_eval --stage retrieval
+
+# Planner: routing accuracy and follow-up rewrites (add --with-retrieval to check
+# that rewritten follow-ups retrieve the right page).
+python -m scripts.run_eval --stage routing --with-retrieval --interval 2
+
+# End to end: fact recall, citation grounding, fallback rate, latency.
+python -m scripts.run_eval --stage answer --interval 5
+```
+
+Filter with `--domain FINANCIAL_AID`, `--type follow_up` or `--limit 20`. Add gates such
+as `--min-routing 0.9 --min-hit3 0.8 --min-facts 0.7` to exit with an error when quality
+drops. Reports are written to `evals/results/` (git-ignored) and conversation history
+goes to a temporary file, never to saved student chats.
+
+The older eight-question check is still available:
 
 ```bash
 python -m scripts.evaluate_financial_aid
 ```
-
-The live check uses your configured Groq key and may call web search. It stores its
-conversations temporarily, leaving saved student chats untouched. Its citation
-check detects links absent from the retrieved material; review the printed answers
-against the sources to assess factual support. The existing routing tests also
-make live model calls.
-
----
 
 ## Author
 
