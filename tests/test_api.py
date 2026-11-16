@@ -27,8 +27,9 @@ def test_health():
 
 def test_chat_returns_valid_response(monkeypatch, tmp_path):
     monkeypatch.setattr(memory, "MEMORY_FILE", tmp_path / "sessions.json")
-    monkeypatch.setattr("chat_service.route", lambda _: {"agent": "CAMPUS", "confidence": 0.9})
-    monkeypatch.setattr("chat_service.campus.run", lambda message, history: "Library answer")
+    monkeypatch.setattr("chat_service.plan", lambda message, history: {
+        "agent": "CAMPUS", "confidence": 0.9, "query": message, "tool": "search_knowledge_base"})
+    monkeypatch.setattr("chat_service.campus.run", lambda message, history, plan: "Library answer")
     response = client.post("/chat", json={"message": "Where is the library?"})
     assert response.status_code == 200
     data = response.json()

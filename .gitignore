@@ -8,3 +8,5 @@ chroma_db/
 memory/sessions.json
 # feedback votes are local user data, not repo content
 feedback.db
+# evaluation reports are generated locally
+evals/results/
