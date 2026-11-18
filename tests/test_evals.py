@@ -89,3 +89,40 @@ def test_retrieval_stage_scores_with_stubbed_index(monkeypatch):
     cases = [c for c in CASES if c["id"] == "financial_aid-037"]
     rows, summary = run_eval.eval_retrieval(cases, Args)
     assert summary["hit@1"] == 1.0 and rows[0]["rr"] == 1.0
+
+
+def test_rate_limited_call_is_retried(monkeypatch):
+    import httpx
+    from groq import RateLimitError
+    monkeypatch.setattr(run_eval, "sleep", lambda seconds: None)
+    calls = []
+
+    def flaky():
+        calls.append(1)
+        if len(calls) < 3:
+            raise RateLimitError("limit", response=httpx.Response(429, request=httpx.Request("POST", "https://x")), body=None)
+        return "ok"
+
+    assert run_eval.with_rate_limit_retry(flaky) == "ok" and len(calls) == 3
+
+
+def test_routing_resume_skips_done_cases_and_checkpoints(monkeypatch, tmp_path):
+    import json as _json
+    import orchestrator
+    seen = []
+
+    def fake_plan(message, history=None):
+        seen.append(message)
+        return {"agent": "GENERAL", "confidence": 0.9, "query": message, "tool": "none"}
+
+    monkeypatch.setattr(orchestrator, "plan", fake_plan)
+    general = [c for c in CASES if c["domain"] == "GENERAL"][:3]
+    previous = tmp_path / "routing.json"
+    previous.write_text(_json.dumps({"stage": "routing", "rows": [
+        {"id": general[0]["id"], "type": "general", "expected": "GENERAL", "agent": "GENERAL",
+         "confidence": 0.9, "query": "q", "tool": "none", "correct": True, "seconds": 0.1}]}))
+    monkeypatch.setattr(run_eval.metrics, "load_cases", lambda **_: general)
+    assert run_eval.main(["--stage", "routing", "--resume", str(previous)]) == 0
+    assert seen == [c["question"] for c in general[1:]]
+    report = _json.loads(previous.read_text())
+    assert report["summary"]["cases"] == 3 and report["summary"]["routing_accuracy"] == 1.0
