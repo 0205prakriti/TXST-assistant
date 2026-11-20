@@ -84,7 +84,7 @@ def parse_plan(raw: str, message: str) -> dict:
 
 def plan(user_message: str, history: list | None = None) -> dict:
     payload = json.dumps({"conversation": _recent(history), "latest_message": user_message})
-    raw = chat(messages=[{"role": "user", "content": payload}], system=PLANNER_PROMPT, json_mode=True)
+    raw = chat(messages=[{"role": "user", "content": payload}], system=PLANNER_PROMPT, json_mode=True, fast=True)
     result = parse_plan(raw, user_message)
     logger.info("plan agent=%s confidence=%.2f tool=%s", result["agent"], result["confidence"], result["tool"])
     return result
