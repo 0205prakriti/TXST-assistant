@@ -4,17 +4,28 @@ import re
 from pathlib import Path
 
 try:
-    from rag.text import sentences
+    from rag.text import heading_text, mark_headings, sentences
 except ModuleNotFoundError:
-    from text import sentences  # Direct invocation: python rag/embedder.py
+    from text import heading_text, mark_headings, sentences  # Direct invocation: python rag/embedder.py
 
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def chunk_text(text: str, chunk_size: int = 1200, overlap: int = 200) -> list:
+# The academic calendar is a date/event table: section headings would attach the wrong
+# event to a date, so those pages keep plain sentence chunks.
+PLAIN_COLLECTIONS = {"academics"}
+
+
+def chunk_text(text: str, chunk_size: int = 1200, overlap: int = 200, headings: bool = True) -> list:
     if chunk_size <= 0 or not 0 <= overlap < chunk_size:
         raise ValueError("Require chunk_size > overlap >= 0")
-    parts = [part for part in sentences(text) if part]
+    parts = [part for part in sentences(mark_headings(text) if headings else text) if part]
+    # Remember the section each sentence sits in, so a chunk that starts mid-section
+    # still carries its heading (e.g. which grant an award amount belongs to).
+    sections, current = [], None
+    for part in parts:
+        current = heading_text(part) or current
+        sections.append(current)
     chunks = []
     start = 0
     while start < len(parts):
@@ -22,7 +33,10 @@ def chunk_text(text: str, chunk_size: int = 1200, overlap: int = 200) -> list:
         while end < len(parts) and (end == start or size + len(parts[end]) + 1 <= chunk_size):
             size += len(parts[end]) + 1
             end += 1
-        chunks.append(" ".join(parts[start:end]))
+        chunk = " ".join(parts[start:end])
+        if sections[start] and not heading_text(parts[start]):
+            chunk = f"## {sections[start]}. {chunk}"
+        chunks.append(chunk)
         if end == len(parts):
             break
         next_start, size = end, 0
@@ -48,9 +62,9 @@ def embed_file(filepath: str, collection_name: str):
 
     sections = re.split(r"--- SOURCE: (https?://[^\s]+) ---", text)
     if len(sections) > 1:
-        records = [(chunk, url) for url, body in zip(sections[1::2], sections[2::2]) for chunk in chunk_text(body)]
+        records = [(chunk, url) for url, body in zip(sections[1::2], sections[2::2]) for chunk in chunk_text(body, headings=collection_name not in PLAIN_COLLECTIONS)]
     else:
-        records = [(chunk, "") for chunk in chunk_text(text)]
+        records = [(chunk, "") for chunk in chunk_text(text, headings=collection_name not in PLAIN_COLLECTIONS)]
 
     if not records:
         raise ValueError("Refusing to replace an index with empty source material")

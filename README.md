@@ -119,7 +119,9 @@ Create a `.env` file:
 ```env
 GROQ_API_KEY=YOUR_API_KEY
 # Optional
-LLM_MODEL=openai/gpt-oss-120b
+LLM_MODEL=openai/gpt-oss-120b          # writes the answers
+LLM_FAST_MODEL=openai/gpt-oss-20b      # routing and passage selection (own rate-limit quota)
+LLM_FAST_REASONING_EFFORT=low
 LLM_TIMEOUT_SECONDS=30
 LLM_MAX_RETRIES=2
 ```

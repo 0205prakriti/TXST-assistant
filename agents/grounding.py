@@ -4,7 +4,7 @@ import re
 import unicodedata
 
 from llm.client import chat
-from rag.text import sentences
+from rag.text import heading_text, sentences
 from chat_format import format_evidence
 
 EVIDENCE_PROMPT = """Choose the supplied TXST passages that directly answer the question.
@@ -22,6 +22,9 @@ refund advice as evidence of a disbursement requirement. If none of the passages
 answer the question, return insufficient_evidence and an empty passage_ids list.
 For a general FAFSA priority-deadline question, do not mix in the separate summer
 financial aid application deadline. The source titles identify their scope.
+Each passage may carry a "section" naming what it describes (for example which grant
+an award amount belongs to). Only select a passage whose section matches the subject
+of the question; a passage in another section is not evidence, even if it looks similar.
 """
 
 
@@ -42,11 +45,19 @@ def source_passages(context):
             while cleaned.startswith(heading[1]):
                 cleaned = cleaned[len(heading[1]):].lstrip()
         cleaned = cleaned.replace("Expand FAQ List ", "")
+        section = None
         for sentence in sentences(cleaned):
+            heading = heading_text(sentence)
+            if heading:
+                section = heading
+                continue
             if not sentence or (url, sentence) in seen:
                 continue
             seen.add((url, sentence))
-            passages[f"p{len(passages) + 1}"] = {"source": url, "title": title, "text": sentence}
+            passage = {"source": url, "title": title, "text": sentence}
+            if section:
+                passage["section"] = section
+            passages[f"p{len(passages) + 1}"] = passage
     return passages
 
 
@@ -65,6 +76,8 @@ def grounded_answer(question: str, context: str, history: list | None = None) ->
             "question": question, "recent_conversation": (history or [])[-6:], "passages": passages,
         })}],
         system=EVIDENCE_PROMPT,
+        json_mode=True,
+        fast=True,
     )
     try:
         payload = json.loads(response)
@@ -82,6 +95,10 @@ def grounded_answer(question: str, context: str, history: list | None = None) ->
         for passage_id in dict.fromkeys(ids):
             passage = passages[passage_id]
             quote = passage["text"]
+            section = passage.get("section")
+            if section and section.lower() not in quote.lower():
+                # Name what the sentence is about: "TEXAS Grant: ... maximum award is $5,000."
+                quote = f"{section}: {quote}"
             # Escape Markdown so source text cannot introduce additional links/HTML.
             quote = quote.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
             quote = re.sub(r"([\\`*_{}\[\]()#!|])", r"\\\1", quote)
