@@ -254,6 +254,11 @@ python -m scripts.run_eval --stage routing --with-retrieval --interval 2
 python -m scripts.run_eval --stage answer --interval 5
 ```
 
+On Groq's free tier (8,000 tokens per minute) the answer stage hits rate limits; the
+script waits 30 seconds and retries automatically. Progress is saved after every
+question, so if a run stops, continue it with
+`python -m scripts.run_eval --stage answer --resume evals/results/<report>.json`.
+
 Filter with `--domain FINANCIAL_AID`, `--type follow_up` or `--limit 20`. Add gates such
 as `--min-routing 0.9 --min-hit3 0.8 --min-facts 0.7` to exit with an error when quality
 drops. Reports are written to `evals/results/` (git-ignored) and conversation history

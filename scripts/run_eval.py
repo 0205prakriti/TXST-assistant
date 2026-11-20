@@ -7,6 +7,8 @@ Stages (run from the project root):
 
 Filters: --domain FINANCIAL_AID, --type follow_up, --limit 20.
 Quality gates (exit code 1 when missed): --min-routing, --min-hit3, --min-facts.
+Rate limits: each case waits and retries on HTTP 429. The report is saved after every
+case, so an interrupted run can continue with --resume evals/results/<report>.json.
 Conversation history is written to a temporary file, never to memory/sessions.json.
 """
 import argparse
@@ -20,6 +22,23 @@ from time import monotonic, sleep
 from unittest.mock import patch
 
 from evals import metrics
+
+RATE_LIMIT_WAIT_SECONDS = 30
+RATE_LIMIT_ATTEMPTS = 6
+
+
+def with_rate_limit_retry(call, *args, **kwargs):
+    """Wait and retry when the model provider rate-limits (Groq free tier: 8k tokens/min)."""
+    from groq import RateLimitError
+    for attempt in range(1, RATE_LIMIT_ATTEMPTS + 1):
+        try:
+            return call(*args, **kwargs)
+        except RateLimitError:
+            if attempt == RATE_LIMIT_ATTEMPTS:
+                raise
+            print(f"Rate limited; waiting {RATE_LIMIT_WAIT_SECONDS}s (attempt {attempt}/{RATE_LIMIT_ATTEMPTS})",
+                  file=sys.stderr, flush=True)
+            sleep(RATE_LIMIT_WAIT_SECONDS)
 
 ROOT = Path(__file__).resolve().parents[1]
 RESULTS_DIR = ROOT / "evals" / "results"
@@ -57,10 +76,11 @@ def eval_retrieval(cases, args):
 
 def eval_routing(cases, args):
     from orchestrator import plan
-    rows = []
+    rows = list(args.prior_rows)
+    cases = [c for c in cases if c["id"] not in args.done_ids]
     for index, case in enumerate(cases):
         start = monotonic()
-        decision = plan(case["question"], case.get("history"))
+        decision = with_rate_limit_retry(plan, case["question"], case.get("history"))
         row = {"id": case["id"], "type": case["type"], "expected": case["domain"],
                "agent": decision["agent"], "confidence": decision["confidence"],
                "query": decision["query"], "tool": decision["tool"],
@@ -69,6 +89,7 @@ def eval_routing(cases, args):
             urls = retrieved_urls(decision["query"], decision["agent"], args.k)
             row["rewrite_hit@3"] = metrics.hit_at_k(urls, case["expected_sources"], 3)
         rows.append(row)
+        checkpoint(args, rows)
         print(json.dumps(row), flush=True)
         _pause(args, start, index, cases)
     follow_ups = [r for r in rows if r["type"] == "follow_up"]
@@ -89,7 +110,8 @@ def eval_answers(cases, args):
     import memory.memory as memory
     from agents import financial_aid, generative
 
-    rows = []
+    rows = list(args.prior_rows)
+    cases = [c for c in cases if c["id"] not in args.done_ids]
     with TemporaryDirectory(prefix="txst-eval-") as temporary:
         with patch.object(memory, "MEMORY_FILE", Path(temporary) / "sessions.json"):
             for index, case in enumerate(cases):
@@ -103,12 +125,12 @@ def eval_answers(cases, args):
                     return wrapper
 
                 session_id = f"eval-{case['id']}"
-                if case.get("history"):
-                    memory.save_history(list(case["history"]), session_id)
                 start = monotonic()
                 with patch.object(generative, "run_tool", capture(generative.run_tool)), \
                         patch.object(financial_aid, "run_tool", capture(financial_aid.run_tool)):
-                    result = chat_service.answer(case["question"], session_id)
+                    if case.get("history"):
+                        memory.save_history(list(case["history"]), session_id)
+                    result = with_rate_limit_retry(chat_service.answer, case["question"], session_id)
                 answer = result["response"]
                 supplied = [line[len("Source: "):].strip() for context in contexts
                             for line in context.splitlines() if line.startswith("Source: ")]
@@ -129,6 +151,7 @@ def eval_answers(cases, args):
                 if case["type"] == "personal":
                     row["discloses_no_access"] = metrics.discloses_no_access(answer)
                 rows.append(row)
+                checkpoint(args, rows)
                 print(json.dumps(row, ensure_ascii=False), flush=True)
                 _pause(args, start, index, cases)
     answerable = [r for r in rows if r["type"] in ("single", "follow_up")]
@@ -144,6 +167,17 @@ def eval_answers(cases, args):
         "p95_seconds": _percentile([r["seconds"] for r in rows], 95),
     }
     return rows, summary
+
+
+def write_report(output, stage, summary, rows):
+    output.parent.mkdir(parents=True, exist_ok=True)
+    output.write_text(json.dumps({"stage": stage, "summary": summary, "rows": rows}, indent=2,
+                                 ensure_ascii=False) + "\n", encoding="utf-8")
+
+
+def checkpoint(args, rows):
+    """Save progress after each case so a crash or Ctrl+C loses nothing."""
+    write_report(args.output, args.stage, {"partial": True, "cases_done": len(rows)}, rows)
 
 
 def _pause(args, start, index, cases):
@@ -180,16 +214,25 @@ def main(argv=None):
     parser.add_argument("--min-hit3", type=float)
     parser.add_argument("--min-facts", type=float)
     parser.add_argument("--output", type=Path)
+    parser.add_argument("--resume", type=Path, help="Continue an interrupted report, skipping finished cases")
     args = parser.parse_args(argv)
+    args.prior_rows, args.done_ids = [], set()
+    if args.resume:
+        previous = json.loads(args.resume.read_text(encoding="utf-8"))
+        if previous.get("stage") != args.stage:
+            parser.error(f"{args.resume} is a {previous.get('stage')} report, not {args.stage}")
+        args.prior_rows = previous["rows"]
+        args.done_ids = {row["id"] for row in args.prior_rows}
+        args.output = args.output or args.resume
+        print(f"Resuming: {len(args.done_ids)} cases already done", flush=True)
+    args.output = args.output or RESULTS_DIR / f"{args.stage}-{datetime.now(timezone.utc):%Y%m%dT%H%M%SZ}.json"
 
     cases = metrics.load_cases(domain=args.domain, case_type=args.case_type)[: args.limit]
     stage = {"retrieval": eval_retrieval, "routing": eval_routing, "answer": eval_answers}[args.stage]
     rows, summary = stage(cases, args)
 
-    output = args.output or RESULTS_DIR / f"{args.stage}-{datetime.now(timezone.utc):%Y%m%dT%H%M%SZ}.json"
-    output.parent.mkdir(parents=True, exist_ok=True)
-    output.write_text(json.dumps({"stage": args.stage, "summary": summary, "rows": rows}, indent=2,
-                                 ensure_ascii=False) + "\n", encoding="utf-8")
+    output = args.output
+    write_report(output, args.stage, summary, rows)
     print("\nSUMMARY " + json.dumps(summary, indent=2))
     print(f"Report: {output}")
     failures = check_gates(summary, args)

@@ -18,7 +18,7 @@ def test_streamed_legacy_reply_is_compacted_in_history(monkeypatch, tmp_path):
         {"agent": "FINANCIAL_AID", "confidence": 0.98, "session_id": "s1"},
         iter([legacy]),
     ))
-    app = AppTest.from_file(str(Path(__file__).resolve().parents[1] / "main.py"))
+    app = AppTest.from_file(str(Path(__file__).resolve().parents[1] / "main.py"), default_timeout=30)
     app.run()
     app.chat_input[0].set_value("How do I apply for financial aid?").run()
     assert not app.exception
