@@ -22,7 +22,7 @@ _TABLE_CELL = re.compile(
 
 
 def sentences(text):
-    return re.split(r"(?<!U\.S\.)(?<!e\.g\.)(?<!i\.e\.)(?<=[.!?])\s+(?=[A-Z#])", " ".join(text.split()))
+    return re.split(r"(?<!U\.S\.)(?<!e\.g\.)(?<!i\.e\.)(?<=[.!?])\s+(?=[A-Z#0-9])", " ".join(text.split()))
 
 
 def is_heading_line(line, previous="", following=""):
@@ -49,14 +49,39 @@ def is_heading_line(line, previous="", following=""):
     return not following or not (following[0] in ".,;:)" or following[0].islower())
 
 
+def is_table_row(label, value):
+    """A short label line followed by a short value line with a number ("1st Bachelor's" / "2.0")."""
+    label, value = label.strip(), value.strip()
+    if not label or not value or label.endswith(_TERMINAL) or value.endswith((".", "!", "?")):
+        return False
+    if len(label.split()) > 6 or len(value.split()) > 8 or label.lower() in _NOT_HEADINGS:
+        return False
+    label_chars = label.replace(" ", "")
+    if sum(c.isalpha() for c in label_chars) < 2 or sum(c.isdigit() for c in label_chars) / len(label_chars) >= 0.3:
+        return False  # "April 11, 2026" or "$278.96" is a value, not a row label
+    # Values are mostly numbers ("2.0", "$5,000", "10:00am - 11:30pm", "November 1, 2025"),
+    # unlike the next row's label ("1st Bachelor's").
+    chars = value.replace(" ", "")
+    digits = sum(c.isdigit() for c in chars)
+    return chars[:1] in "$" + "0123456789" and digits / len(chars) >= 0.3 or \
+        bool(re.match(r"(january|february|march|april|may|june|july|august|september|october|november|december) \d", value, re.I))
+
+
 def mark_headings(text):
-    """Turn heading lines into '## Heading.' sentences; leave all other text unchanged."""
+    """Mark heading lines as '## Heading.' and join table rows as 'Label: value.'"""
     lines = [line.strip() for line in text.splitlines() if line.strip()]
-    marked = []
-    for index, line in enumerate(lines):
+    marked, index = [], 0
+    while index < len(lines):
+        line = lines[index]
         previous = lines[index - 1] if index else ""
         following = lines[index + 1] if index + 1 < len(lines) else ""
+        if is_table_row(line, following):
+            # Keep a value with its label so "2.0" is not quoted on its own.
+            marked.append(f"{line}: {following}.")
+            index += 2
+            continue
         marked.append(f"{HEADING_MARK}{line}." if is_heading_line(line, previous, following) else line)
+        index += 1
     return "\n".join(marked)
 
 

@@ -18,6 +18,10 @@ MODEL = os.getenv("LLM_MODEL", "openai/gpt-oss-120b")
 # is faster, uses fewer tokens and has its own rate-limit quota on Groq.
 FAST_MODEL = os.getenv("LLM_FAST_MODEL", "openai/gpt-oss-20b")
 FAST_REASONING_EFFORT = os.getenv("LLM_FAST_REASONING_EFFORT", "low")
+# Routing decides which knowledge base is searched, so it defaults to the main model:
+# in evaluation gpt-oss-20b (low effort) misrouted 8 of 76 questions versus 2 of 155.
+PLANNER_MODEL = os.getenv("LLM_PLANNER_MODEL", MODEL)
+PLANNER_REASONING_EFFORT = os.getenv("LLM_PLANNER_REASONING_EFFORT", "")
 MAX_TOKENS = int(os.getenv("LLM_MAX_TOKENS", "1000"))
 TIMEOUT_SECONDS = float(os.getenv("LLM_TIMEOUT_SECONDS", "30"))
 MAX_RETRIES = int(os.getenv("LLM_MAX_RETRIES", "2"))
@@ -32,18 +36,21 @@ def _with_system(messages: list, system: str) -> list:
     return ([{"role": "system", "content": system}] if system else []) + list(messages)
 
 
-def _fast_options(model: str) -> dict:
-    # gpt-oss models spend tokens on hidden reasoning; low effort keeps quick calls quick.
-    if model.startswith("openai/gpt-oss") and FAST_REASONING_EFFORT:
-        return {"extra_body": {"reasoning_effort": FAST_REASONING_EFFORT}}
+def _effort_options(model: str, effort: str | None) -> dict:
+    # gpt-oss models spend tokens on hidden reasoning; a lower effort keeps quick calls quick.
+    if effort and model.startswith("openai/gpt-oss"):
+        return {"extra_body": {"reasoning_effort": effort}}
     return {}
 
 
-def chat(messages: list, system: str = "", json_mode: bool = False, fast: bool = False) -> str:
+def chat(messages: list, system: str = "", json_mode: bool = False, fast: bool = False,
+         model: str | None = None, reasoning_effort: str | None = None) -> str:
     """Return the full reply. json_mode asks for one JSON object; fast uses the small model."""
-    model = FAST_MODEL if fast else MODEL
+    if fast:
+        model, reasoning_effort = model or FAST_MODEL, reasoning_effort or FAST_REASONING_EFFORT
+    model = model or MODEL
     kwargs = {"model": model, "max_tokens": MAX_TOKENS, "messages": _with_system(messages, system),
-              **(_fast_options(model) if fast else {})}
+              **_effort_options(model, reasoning_effort)}
     if json_mode:
         try:
             response = _client().chat.completions.create(response_format={"type": "json_object"}, **kwargs)

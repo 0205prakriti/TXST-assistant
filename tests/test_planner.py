@@ -30,8 +30,8 @@ def test_parse_plan_repairs_missing_query_tool_and_bad_confidence():
 def test_plan_sends_truncated_history_to_one_json_call(monkeypatch):
     calls = []
 
-    def fake_chat(messages, system="", json_mode=False, fast=False):
-        calls.append({"messages": messages, "json_mode": json_mode, "fast": fast})
+    def fake_chat(messages, system="", json_mode=False, model=None, reasoning_effort=None):
+        calls.append({"messages": messages, "json_mode": json_mode, "model": model})
         return json.dumps({"agent": "ACADEMICS", "confidence": 0.9,
                            "standalone_query": "TXST last day to withdraw spring 2026", "tool": "search_knowledge_base"})
 
@@ -41,7 +41,7 @@ def test_plan_sends_truncated_history_to_one_json_call(monkeypatch):
         {"role": "assistant", "content": "x" * 5000},
     ]
     result = orchestrator.plan("And spring?", history)
-    assert len(calls) == 1 and calls[0]["json_mode"] and calls[0]["fast"]
+    assert len(calls) == 1 and calls[0]["json_mode"] and calls[0]["model"] == orchestrator.PLANNER_MODEL
     payload = json.loads(calls[0]["messages"][0]["content"])
     assert payload["latest_message"] == "And spring?"
     assert len(payload["conversation"]) == orchestrator.HISTORY_TURNS
