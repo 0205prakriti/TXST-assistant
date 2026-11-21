@@ -6,7 +6,7 @@ saw the conversation, so a follow-up like "and its hours?" lost its subject.
 import json
 import logging
 
-from llm.client import chat
+from llm.client import PLANNER_MODEL, PLANNER_REASONING_EFFORT, chat
 
 logger = logging.getLogger(__name__)
 
@@ -84,7 +84,8 @@ def parse_plan(raw: str, message: str) -> dict:
 
 def plan(user_message: str, history: list | None = None) -> dict:
     payload = json.dumps({"conversation": _recent(history), "latest_message": user_message})
-    raw = chat(messages=[{"role": "user", "content": payload}], system=PLANNER_PROMPT, json_mode=True, fast=True)
+    raw = chat(messages=[{"role": "user", "content": payload}], system=PLANNER_PROMPT, json_mode=True,
+               model=PLANNER_MODEL, reasoning_effort=PLANNER_REASONING_EFFORT or None)
     result = parse_plan(raw, user_message)
     logger.info("plan agent=%s confidence=%.2f tool=%s", result["agent"], result["confidence"], result["tool"])
     return result

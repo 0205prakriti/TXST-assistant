@@ -92,3 +92,34 @@ def test_fast_calls_use_small_model_with_low_reasoning(monkeypatch):
     assert sent[0]["model"] == client.FAST_MODEL
     assert sent[0]["extra_body"] == {"reasoning_effort": client.FAST_REASONING_EFFORT}
     assert sent[1]["model"] == client.MODEL and "extra_body" not in sent[1]
+
+
+def test_table_rows_keep_values_with_labels():
+    from rag.text import is_table_row
+    table = """Minimum Cumulative Texas State GPA Requirements
+Degree or Certificate
+Minimum Cumulative Texas State GPA
+1st Bachelor's
+2.0
+Master's
+3.0
+"""
+    marked = mark_headings(table).splitlines()
+    assert "1st Bachelor's: 2.0." in marked and "Master's: 3.0." in marked
+    assert not any(line == "2.0" for line in marked)
+    assert is_table_row("Monday-Thursday", "10:00am - 11:30pm")
+    assert is_table_row("Fall semester only", "November 1, 2026")
+    assert not is_table_row("Minimum Cumulative Texas State GPA", "1st Bachelor's")
+    assert not is_table_row("April 11, 2026", "2025-2026")
+    assert not is_table_row("-", "9:00pm")
+    assert not is_table_row("This is a full sentence.", "2.0")
+
+
+def test_real_sap_page_pairs_gpa_rows():
+    import re
+    raw = (ROOT / "context" / "financial_aid.txt").read_text(encoding="utf-8")
+    parts = re.split(r"--- SOURCE: (\S+) ---", raw)
+    body = next(b for u, b in zip(parts[1::2], parts[2::2]) if "maintain.html" in u)
+    context = "".join(f"Source: https://x/maintain.html\n{chunk}\n\n" for chunk in chunk_text(body))
+    texts = [p["text"] for p in grounding.source_passages(context).values()]
+    assert "1st Bachelor's: 2.0." in texts and "Master's: 3.0." in texts
